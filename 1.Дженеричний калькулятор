@@ -1,0 +1,70 @@
+using System;
+
+public class Calculator<T>
+{
+
+    public Func<T, T, T> Add { get; set; }
+    public Func<T, T, T> Subtract { get; set; }
+    public Func<T, T, T> Multiply { get; set; }
+    public Func<T, T, T> Divide { get; set; }
+
+    public Calculator()
+    {
+
+        Add = (x, y) => (dynamic)x + y;
+        Subtract = (x, y) => (dynamic)x - y;
+        Multiply = (x, y) => (dynamic)x * y;
+        Divide = (x, y) => (dynamic)x / y;
+    }
+
+
+    public T PerformAddition(T x, T y)
+    {
+        return Add(x, y);
+    }
+
+    public T PerformSubtraction(T x, T y)
+    {
+        return Subtract(x, y);
+    }
+
+    public T PerformMultiplication(T x, T y)
+    {
+        return Multiply(x, y);
+    }
+
+    public T PerformDivision(T x, T y)
+    {
+        if (y.Equals((T)(dynamic)0))
+        {
+            throw new InvalidOperationException("Division by zero is not allowed.");
+        }
+        return Divide(x, y);
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+
+        var intCalculator = new Calculator<int>();
+
+        int resultIntAdd = intCalculator.PerformAddition(5, 3);
+        int resultIntSubtract = intCalculator.PerformSubtraction(8, 2);
+        int resultIntMultiply = intCalculator.PerformMultiplication(4, 6);
+        int resultIntDivide = intCalculator.PerformDivision(10, 2);
+
+        Console.WriteLine($"int Calculator - Add: {resultIntAdd}, Subtract: {resultIntSubtract}, Multiply: {resultIntMultiply}, Divide: {resultIntDivide}");
+
+
+        var doubleCalculator = new Calculator<double>();
+
+        double resultDoubleAdd = doubleCalculator.PerformAddition(3.5, 2.1);
+        double resultDoubleSubtract = doubleCalculator.PerformSubtraction(8.9, 1.5);
+        double resultDoubleMultiply = doubleCalculator.PerformMultiplication(4.0, 2.5);
+        double resultDoubleDivide = doubleCalculator.PerformDivision(10.0, 3.0);
+
+        Console.WriteLine($"double Calculator - Add: {resultDoubleAdd}, Subtract: {resultDoubleSubtract}, Multiply: {resultDoubleMultiply}, Divide: {resultDoubleDivide}");
+    }
+}
