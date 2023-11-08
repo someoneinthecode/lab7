@@ -1,0 +1,55 @@
+using System;
+using System.Collections.Generic;
+
+public class TaskScheduler<TTask, TPriority>
+{
+    private readonly List<Tuple<TTask, TPriority>> taskQueue = new List<Tuple<TTask, TPriority>>();
+
+    public delegate void TaskExecution(TTask task);
+
+    public void AddTask(TTask task, TPriority priority)
+    {
+        taskQueue.Add(new Tuple<TTask, TPriority>(task, priority));
+        taskQueue.Sort((x, y) => Comparer<TPriority>.Default.Compare(x.Item2, y.Item2));
+    }
+
+    public void ExecuteNext(TaskExecution taskExecution)
+    {
+        if (taskQueue.Count > 0)
+        {
+            var nextTask = taskQueue[0].Item1;
+            taskQueue.RemoveAt(0);
+            taskExecution(nextTask);
+        }
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        var taskScheduler = new TaskScheduler<string, int>();
+
+        taskScheduler.AddTask("Завдання 1", 2);
+        taskScheduler.AddTask("Завдання 2", 1);
+        taskScheduler.AddTask("Завдання 3", 3);
+
+        Console.WriteLine("Виконання завдань:");
+        taskScheduler.ExecuteNext(task => Console.WriteLine($"Виконую завдання: {task}"));
+        taskScheduler.ExecuteNext(task => Console.WriteLine($"Виконую завдання: {task}"));
+        taskScheduler.ExecuteNext(task => Console.WriteLine($"Виконую завдання: {task}"));
+
+        while (true)
+        {
+            Console.WriteLine("Введіть завдання (або 'exit' для виходу): ");
+            string input = Console.ReadLine();
+            if (input.ToLower() == "exit")
+                break;
+
+            Console.WriteLine("Введіть пріоритет: ");
+            int priority = int.Parse(Console.ReadLine());
+
+            taskScheduler.AddTask(input, priority);
+        }
+    }
+}
