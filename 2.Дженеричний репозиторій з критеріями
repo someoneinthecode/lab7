@@ -1,0 +1,61 @@
+using System;
+using System.Collections.Generic;
+
+
+public delegate bool Criteria<T>(T item);
+
+
+public class Repository<T>
+{
+    private List<T> data = new List<T>();
+
+
+    public void Add(T item)
+    {
+        data.Add(item);
+    }
+
+
+    public List<T> Find(Criteria<T> criteria)
+    {
+        List<T> result = new List<T>();
+
+        foreach (T item in data)
+        {
+            if (criteria(item))
+            {
+                result.Add(item);
+            }
+        }
+
+        return result;
+    }
+}
+
+
+class Program
+{
+    static void Main()
+    {
+        Repository<int> intRepository = new Repository<int>();
+
+
+        for (int i = 1; i <= 10; i++)
+        {
+            intRepository.Add(i);
+        }
+
+
+        Criteria<int> isEven = x => x % 2 == 0;
+
+
+        List<int> evenNumbers = intRepository.Find(isEven);
+
+
+        Console.WriteLine("Парні числа:");
+        foreach (int number in evenNumbers)
+        {
+            Console.WriteLine(number);
+        }
+    }
+}
