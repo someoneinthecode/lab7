@@ -1,0 +1,43 @@
+using System;
+using System.Collections.Generic;
+
+public class FunctionCache<TKey, TResult>
+{
+    private Dictionary<TKey, CacheItem> cache = new Dictionary<TKey, CacheItem>();
+    
+    public delegate TResult Func<TKey, TResult>(TKey key);
+    
+    public TResult GetOrAdd(TKey key, Func<TKey, TResult> func, TimeSpan cacheDuration)
+    {
+        if (cache.ContainsKey(key) && !IsCacheItemExpired(key))
+        {
+            return cache[key].Value;
+        }
+        
+        TResult result = func(key);
+        cache[key] = new CacheItem(result, DateTime.Now.Add(cacheDuration));
+        
+        return result;
+    }
+    
+    private bool IsCacheItemExpired(TKey key)
+    {
+        if (cache.ContainsKey(key))
+        {
+            return DateTime.Now > cache[key].ExpirationTime;
+        }
+        return true;
+    }
+    
+    private class CacheItem
+    {
+        public TResult Value { get; }
+        public DateTime ExpirationTime { get; }
+
+        public CacheItem(TResult value, DateTime expirationTime)
+        {
+            Value = value;
+            ExpirationTime = expirationTime;
+        }
+    }
+}
